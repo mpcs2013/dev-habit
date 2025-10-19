@@ -109,4 +109,26 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
 
         return NoContent();
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteHabit(string id)
+    {
+        Habit habit = await dbContext.Habits.FirstOrDefaultAsync(h => h.Id == id);
+
+        if(habit is null)
+        {
+            return NotFound();
+            // Response if we have historical data to validate if data previously existed 
+            // use case: Soft-Deletes
+            // Flag resources as deleted, instead of removing it completely
+            // Allows for "un-delete" operations
+            // Remarks: Is soft-delete hiding a business operation? maybe perform archive is enough
+            //return StatusCode(StatusCodes.Status410Gone); 
+        }
+
+        dbContext.Habits.Remove(habit);
+        await dbContext.SaveChangesAsync();
+
+        return NoContent();
+    }
 }
