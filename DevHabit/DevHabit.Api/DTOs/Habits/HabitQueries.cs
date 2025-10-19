@@ -28,7 +28,7 @@ internal static class HabitQueries
             EndDate = h.EndDate,
             Milestone = h.Milestone == null ? null : new MilestoneDto
             {
-                Value = h.Milestone.Value,
+                Target = h.Milestone.Target,
                 Current = h.Milestone.Current
             },
             CreatedAtUtc = h.CreatedAtUtc,
