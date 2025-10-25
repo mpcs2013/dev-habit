@@ -51,11 +51,12 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
         CreateHabitDto createHabitDto,
         IValidator<CreateHabitDto> validator)
     {
-        ValidationResult validationResult = await validator.ValidateAsync(createHabitDto);
-        if(!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.ToDictionary());
-        }
+        await validator.ValidateAndThrowAsync(createHabitDto);
+        //ValidationResult validationResult = await validator.ValidateAsync(createHabitDto);
+        //if(!validationResult.IsValid)
+        //{
+        //    return BadRequest(validationResult.ToDictionary());
+        //}
 
         Habit habit = createHabitDto.ToEntity();
 
