@@ -1,6 +1,8 @@
-﻿using DevHabit.Api.Database;
+﻿using System.Linq.Dynamic.Core;
+using DevHabit.Api.Database;
 using DevHabit.Api.DTOs.Habits;
 using DevHabit.Api.Entities;
+using DevHabit.Api.Services.Sorting;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
@@ -16,9 +18,29 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
 {
     [HttpGet]
     public async Task<ActionResult<HabitsCollectionDto>> GetHabits(
-        [FromQuery] HabitsQueryParameters query)
+        [FromQuery] HabitsQueryParameters query,
+        SortMappingProvider sortMappingProvider)
     {
-        query.Search = string.IsNullOrWhiteSpace(query.Search) ? null : query.Search.Trim().ToLowerInvariant();
+        if(!sortMappingProvider.ValidateMappings<HabitDto, Habit>(query.Sort))
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                detail: $"The provided sort parameter isn't valid: '{query.Sort}'");
+        }
+
+        //query.Search = string.IsNullOrWhiteSpace(query.Search) ? null : query.Search.Trim().ToLowerInvariant();
+        query.Search ??= query.Search?.Trim().ToLower();
+
+        SortMapping[] sortMappings = sortMappingProvider.GetMappings<HabitDto, Habit>();
+
+        //Expression<Func<Habit, object>> orderBy = query.Sort switch
+        //{
+        //    "name" => h => h.Name,
+        //    "description" => h => h.Description,
+        //    "type" => h => h.Type,
+        //    "status" => h => h.Status, 
+        //    _ => Habit => Habit.Name
+        //};
 
 #pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         List<HabitDto> habits = await dbContext
@@ -28,6 +50,10 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
                 h.Description != null && h.Description.ToLower().Contains(query.Search))
             .Where(h => query.Type == null || h.Type == query.Type)
             .Where(h => query.Status == null || h.Status == query.Status)
+            .ApplySort(query.Sort, sortMappings)
+            //.OrderBy(orderBy)
+            ////.OrderBy(h => h.Name)
+            ////.ThenBy(h => h.CreatedAtUtc)
             .Select(HabitQueries.ProjectToDto())
             .ToListAsync();
 #pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
