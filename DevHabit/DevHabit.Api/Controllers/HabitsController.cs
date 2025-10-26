@@ -1,5 +1,6 @@
 ﻿using System.Linq.Dynamic.Core;
 using DevHabit.Api.Database;
+using DevHabit.Api.DTOs.Common;
 using DevHabit.Api.DTOs.Habits;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Services.Sorting;
@@ -17,7 +18,7 @@ namespace DevHabit.Api.Controllers;
 public sealed class HabitsController(ApplicationDbContext dbContext) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<HabitsCollectionDto>> GetHabits(
+    public async Task<ActionResult<PaginationResult<HabitDto>>> GetHabits(
         [FromQuery] HabitsQueryParameters query,
         SortMappingProvider sortMappingProvider)
     {
@@ -43,7 +44,7 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
         //};
 
 #pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
-        List<HabitDto> habits = await dbContext
+        IQueryable<HabitDto> habitsQuery = dbContext
             .Habits
             .Where(h => query.Search == null ||
                 h.Name.ToLower().Contains(query.Search) ||
@@ -51,18 +52,23 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
             .Where(h => query.Type == null || h.Type == query.Type)
             .Where(h => query.Status == null || h.Status == query.Status)
             .ApplySort(query.Sort, sortMappings)
-            //.OrderBy(orderBy)
-            ////.OrderBy(h => h.Name)
-            ////.ThenBy(h => h.CreatedAtUtc)
-            .Select(HabitQueries.ProjectToDto())
-            .ToListAsync();
+            .Select(HabitQueries.ProjectToDto());
 #pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
 
-        var habitsCollectionDto = new HabitsCollectionDto
-        {
-            Data = habits
-        };
-        return Ok(habitsCollectionDto);
+        
+        //List<HabitDto> habits = await habitsQuery
+        //    //.OrderBy(orderBy)
+        //    ////.OrderBy(h => h.Name)
+        //    ////.ThenBy(h => h.CreatedAtUtc)
+        //    .Take(query.PageSize)
+        //    .ToListAsync();
+
+        PaginationResult<HabitDto> paginationResult = await PaginationResult<HabitDto>.CreateAsync(
+            habitsQuery,
+            query.Page,
+            query.PageSize);
+
+        return Ok(paginationResult);
     }
 
     [HttpGet("{id}")]
