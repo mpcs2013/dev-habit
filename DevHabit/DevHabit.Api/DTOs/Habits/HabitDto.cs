@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using DevHabit.Api.DTOs.Common;
 using DevHabit.Api.Entities;
 using Newtonsoft.Json;
 
@@ -10,7 +11,7 @@ namespace DevHabit.Api.DTOs.Habits;
 //    public required string[] Tags { get; init; }
 //}
 
-public sealed record HabitDto
+public sealed record HabitDto : ILinksResponse
 {
     public required string Id { get; init; }
     public required string Name { get; init; }
@@ -25,6 +26,7 @@ public sealed record HabitDto
     public required DateTime CreatedAtUtc { get; init; }
     public DateTime? UpdatedAtUtc { get; init; }
     public DateTime? LastCompletedAtUtc { get; init; }
+    public List<LinkDto> Links { get; set; }
 }
 
 public sealed record FrequencyDto
