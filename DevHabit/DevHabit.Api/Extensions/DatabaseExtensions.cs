@@ -8,19 +8,13 @@ public static class DatabaseExtensions
     public static async Task ApplyMigrationAsync(this WebApplication app)
     {
         using IServiceScope scope = app.Services.CreateScope();
-        await using ApplicationDbContext applicationDbContext = 
-            scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        await using ApplicationIdentityDbContext identityDbContext = 
-            scope.ServiceProvider.GetRequiredService<ApplicationIdentityDbContext>();
+        await using ApplicationDbContext dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         try
         { 
-            await applicationDbContext.Database.MigrateAsync();
-            app.Logger.LogInformation("Application database migration applied successfully.");
+            await dbContext.Database.MigrateAsync();
 
-            await identityDbContext.Database.MigrateAsync();
-            app.Logger.LogInformation("Identity database migration applied successfully.");
-
+            app.Logger.LogInformation("Database migration applied successfully.");
         }
         catch (Exception e)
         {
