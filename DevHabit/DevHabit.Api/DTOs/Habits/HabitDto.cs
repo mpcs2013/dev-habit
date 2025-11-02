@@ -32,7 +32,7 @@ public sealed record HabitDto : ILinksResponse
 public sealed record FrequencyDto
 {
     public required FrequencyType Type { get; init; }
-    public required int TimePerPeriod { get; init; }
+    public required int TimesPerPeriod { get; init; }
 }
 
 public sealed record TargetDto

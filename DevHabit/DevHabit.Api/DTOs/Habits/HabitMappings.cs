@@ -16,7 +16,7 @@ public static class HabitMappings
                 $"{nameof(HabitDto.Frequency)}.{nameof(FrequencyDto.Type)}",
                 $"{nameof(Habit.Frequency)}.{nameof(Frequency.Type)}"),
             new SortMapping(
-                $"{nameof(HabitDto.Frequency)}.{nameof(FrequencyDto.TimePerPeriod)}",
+                $"{nameof(HabitDto.Frequency)}.{nameof(FrequencyDto.TimesPerPeriod)}",
                 $"{nameof(Habit.Frequency)}.{nameof(Frequency.TimesPerPeriod)}"),
             new SortMapping(
                 $"{nameof(HabitDto.Target)}.{nameof(TargetDto.Value)}",
@@ -43,7 +43,7 @@ public static class HabitMappings
             Frequency = new FrequencyDto
             {
                 Type = habit.Frequency.Type,
-                TimePerPeriod = habit.Frequency.TimesPerPeriod
+                TimesPerPeriod = habit.Frequency.TimesPerPeriod
             },
             Target = new TargetDto
             {
@@ -76,7 +76,7 @@ public static class HabitMappings
             Frequency = new Frequency
             {
                 Type = dto.Frequency.Type,
-                TimesPerPeriod = dto.Frequency.TimePerPeriod
+                TimesPerPeriod = dto.Frequency.TimesPerPeriod
             },
             Target = new Target
             {
@@ -111,7 +111,7 @@ public static class HabitMappings
         habit.Frequency = new Frequency
         {
             Type = dto.Frequency.Type,
-            TimesPerPeriod = dto.Frequency.TimePerPeriod
+            TimesPerPeriod = dto.Frequency.TimesPerPeriod
         };
 
         // Update Target

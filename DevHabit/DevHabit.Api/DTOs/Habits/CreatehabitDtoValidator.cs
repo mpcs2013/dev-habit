@@ -35,7 +35,7 @@ public sealed class CreatehabitDtoValidator : AbstractValidator<CreateHabitDto>
             .IsInEnum()
             .WithMessage("Invalid frequency period");
 
-        RuleFor(x => x.Frequency.TimePerPeriod)
+        RuleFor(x => x.Frequency.TimesPerPeriod)
             .GreaterThan(0)
             .WithMessage("Frequency must be greather than 0");
 

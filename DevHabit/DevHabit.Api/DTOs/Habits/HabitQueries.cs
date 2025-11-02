@@ -16,7 +16,7 @@ internal static class HabitQueries
             Frequency = new FrequencyDto
             {
                 Type = h.Frequency.Type,
-                TimePerPeriod = h.Frequency.TimesPerPeriod
+                TimesPerPeriod = h.Frequency.TimesPerPeriod
             },
             Target = new TargetDto
             {
@@ -37,7 +37,7 @@ internal static class HabitQueries
         };
     }
 
-    public static Expression<Func<Habit, HabitWithTagsDto>> ProjectToWithTagsDto()
+    public static Expression<Func<Habit, HabitWithTagsDto>> ProjectToDtoWithTags()
     {
         return h => new HabitWithTagsDto
         {
@@ -48,7 +48,7 @@ internal static class HabitQueries
             Frequency = new FrequencyDto
             {
                 Type = h.Frequency.Type,
-                TimePerPeriod = h.Frequency.TimesPerPeriod
+                TimesPerPeriod = h.Frequency.TimesPerPeriod
             },
             Target = new TargetDto
             {
@@ -67,11 +67,10 @@ internal static class HabitQueries
             UpdatedAtUtc = h.UpdatedAtUtc,
             LastCompletedAtUtc = h.LastCompletedAtUtc,
             Tags = h.Tags.Select(t => t.Name).ToArray()
-
         };
     }
 
-    public static Expression<Func<Habit, HabitWithTagsDtoV2>> ProjectToWithTagsDtoV2()
+    public static Expression<Func<Habit, HabitWithTagsDtoV2>> ProjectToDtoWithTagsV2()
     {
         return h => new HabitWithTagsDtoV2
         {
@@ -82,7 +81,7 @@ internal static class HabitQueries
             Frequency = new FrequencyDto
             {
                 Type = h.Frequency.Type,
-                TimePerPeriod = h.Frequency.TimesPerPeriod
+                TimesPerPeriod = h.Frequency.TimesPerPeriod
             },
             Target = new TargetDto
             {
@@ -101,7 +100,6 @@ internal static class HabitQueries
             UpdatedAt = h.UpdatedAtUtc,
             LastCompletedAt = h.LastCompletedAtUtc,
             Tags = h.Tags.Select(t => t.Name).ToArray()
-
         };
     }
 }

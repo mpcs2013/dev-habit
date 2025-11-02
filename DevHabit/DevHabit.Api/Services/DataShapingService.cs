@@ -16,23 +16,19 @@ public sealed class DataShapingService
             .Select(f => f.Trim())
             .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
 
-        // Get or add the property infos for type T from the cache - or retrieve them if already cached
-        // This improves performance by avoiding repeated reflection calls
         PropertyInfo[] propertyInfos = PropertiesCache.GetOrAdd(
             typeof(T),
-            t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            );
+            t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance));
 
         if (fieldsSet.Any())
         {
             propertyInfos = propertyInfos
-            .Where(pi => fieldsSet.Contains(pi.Name))
-            .ToArray();
+                .Where(p => fieldsSet.Contains(p.Name))
+                .ToArray();
         }
 
         IDictionary<string, object?> shapedObject = new ExpandoObject();
 
-        // apply data shaping
         foreach (PropertyInfo propertyInfo in propertyInfos)
         {
             shapedObject[propertyInfo.Name] = propertyInfo.GetValue(entity);
@@ -42,7 +38,7 @@ public sealed class DataShapingService
     }
 
     public List<ExpandoObject> ShapeCollectionData<T>(
-        IEnumerable<T> entities, 
+        IEnumerable<T> entities,
         string? fields,
         Func<T, List<LinkDto>>? linksFactory = null)
     {
@@ -51,18 +47,15 @@ public sealed class DataShapingService
             .Select(f => f.Trim())
             .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
 
-        // Get or add the property infos for type T from the cache - or retrieve them if already cached
-        // This improves performance by avoiding repeated reflection calls
         PropertyInfo[] propertyInfos = PropertiesCache.GetOrAdd(
-            typeof(T), 
-            t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            );
+            typeof(T),
+            t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance));
 
-        if(fieldsSet.Any())
-        { 
+        if (fieldsSet.Any())
+        {
             propertyInfos = propertyInfos
-            .Where(pi => fieldsSet.Contains(pi.Name))
-            .ToArray();
+                .Where(p => fieldsSet.Contains(p.Name))
+                .ToArray();
         }
 
         List<ExpandoObject> shapedObjects = [];
@@ -70,16 +63,14 @@ public sealed class DataShapingService
         {
             IDictionary<string, object?> shapedObject = new ExpandoObject();
 
-            // apply data shaping
-            foreach(PropertyInfo propertyInfo in propertyInfos)
+            foreach (PropertyInfo propertyInfo in propertyInfos)
             {
                 shapedObject[propertyInfo.Name] = propertyInfo.GetValue(entity);
             }
 
-            if(linksFactory is not null)
+            if (linksFactory is not null)
             {
-                List<LinkDto> links = linksFactory(entity);
-                shapedObject["links"] = links;
+                shapedObject["links"] = linksFactory(entity);
             }
 
             shapedObjects.Add((ExpandoObject)shapedObject);
@@ -88,25 +79,22 @@ public sealed class DataShapingService
         return shapedObjects;
     }
 
-    public bool ValidateFields<T>(string? fields)
+    public bool Validate<T>(string? fields)
     {
-        if(string.IsNullOrWhiteSpace(fields))
+        if (string.IsNullOrWhiteSpace(fields))
         {
             return true;
         }
 
-        HashSet<string> fieldsSet = fields
+        var fieldsSet = fields
             .Split(',', StringSplitOptions.RemoveEmptyEntries)
             .Select(f => f.Trim())
-            .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        // Get or add the property infos for type T from the cache - or retrieve them if already cached
-        // This improves performance by avoiding repeated reflection calls
         PropertyInfo[] propertyInfos = PropertiesCache.GetOrAdd(
             typeof(T),
-            t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            );
+            t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance));
 
-        return fieldsSet.All(field => propertyInfos.Any(pi => pi.Name.Equals(field, StringComparison.OrdinalIgnoreCase)));
+        return fieldsSet.All(f => propertyInfos.Any(p => p.Name.Equals(f, StringComparison.OrdinalIgnoreCase)));
     }
 }
