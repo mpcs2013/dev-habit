@@ -25,6 +25,10 @@ app.UseHttpsRedirection();
 // Enable UseExceptionHandler middleware 
 app.UseExceptionHandler();
 
+// The order to implement this middleware are important
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 await app.RunAsync();
