@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - ASP.NET-Core-Identity
 
 env:
   DOTNET_VERSION: "9.x"
