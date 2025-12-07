@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using DevHabit.Api.Database;
 using DevHabit.Api.DTOs.Users;
+using DevHabit.Api.Entities;
 using DevHabit.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,12 +9,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Controllers;
 
-[Authorize]
+// Allow both Members and Admins to access user endpoints
+// [Authorize(Roles = $"{Roles.Member},{Roles.Admin}")]
+[Authorize(Roles = Roles.Member)]
 [ApiController]
 [Route("users")]
 public class UserController(ApplicationDbContext dbContext, UserContext userContext) : ControllerBase
 {
     [HttpGet("{id}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> GetUserById(string id)
     {
         string? userId = await userContext.GetUserIdAsync();

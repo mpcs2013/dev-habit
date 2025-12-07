@@ -25,9 +25,11 @@ public sealed class TokenProvider(IOptions<JwtAuthOptions> options)
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         List<Claim> claims =
-            [new Claim(JwtRegisteredClaimNames.Sub, tokenRequest.UserId),
-             new Claim(JwtRegisteredClaimNames.Email, tokenRequest.Email)
-            ];
+        [
+            new Claim(JwtRegisteredClaimNames.Sub, tokenRequest.UserId),
+            new Claim(JwtRegisteredClaimNames.Email, tokenRequest.Email),
+            ..tokenRequest.Roles.Select(role => new Claim(ClaimTypes.Role, role))
+        ];
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

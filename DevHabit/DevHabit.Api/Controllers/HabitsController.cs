@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Controllers;
 
-[Authorize]
+[Authorize(Roles = Roles.Member)]
 [ApiController]
 [Route("habits")]
 [ApiVersion(1.0)]
@@ -351,6 +351,9 @@ public sealed class HabitsController(
 
     private List<LinkDto> CreateLinksForHabit(string id, string? fields)
     {
+        // return true/false if user has Roles.Member
+        //bool isUserRoleMember = User.IsInRole(Roles.Member);
+
         List<LinkDto> links =
         [
             linkService.Create(nameof(GetHabit), "self", HttpMethods.Get, new { id, fields }),
